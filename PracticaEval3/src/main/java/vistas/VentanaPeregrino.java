@@ -5,15 +5,18 @@
  */
 package vistas;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 //import java.sql.Date;
-import java.util.Date;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -24,6 +27,10 @@ import javax.swing.JOptionPane;
  * @author Vespertino
  */
 public class VentanaPeregrino extends javax.swing.JFrame {
+    private String myDriver;
+    //private String myUrl = "jdbc:mysql://192.168.209.128:3306/ELCAMINO?zeroDateTimeBehavior=convertToNull";
+    private String myUrl;
+    private Connection conn;
 
     /**
      * Creates new form VentanaAlbergue
@@ -31,7 +38,30 @@ public class VentanaPeregrino extends javax.swing.JFrame {
     public VentanaPeregrino() {
         initComponents();
         setTitle("Peregrinos");
+        //hacer conexión
+        myDriver = "com.mysql.cj.jdbc.Driver";
+        myUrl = "jdbc:mysql://192.168.25.128:3306/ELCAMINO";
+        try {
+            Class.forName(myDriver);
+            conn = DriverManager.getConnection(myUrl, "usuario", "curso2122");
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    conn.close(); //se cierra la conexión al cerrar la ventana.
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+
     }
 
     /**
@@ -186,10 +216,27 @@ public class VentanaPeregrino extends javax.swing.JFrame {
         txtNacionPeregrino.setText("");
     }//GEN-LAST:event_jButton1MouseClicked
 
+    private String fixFecha(String fecha){
+        String resultado = "";
+        StringTokenizer st = new StringTokenizer(fecha, "/");
+        String[] elementos = new String[3];
+        for (int i = 0; i < elementos.length; i++) {
+            elementos[i]=st.nextToken();
+        }
+
+        for (int i = elementos.length-1; i >-1 ; i--) {
+            resultado += elementos[i]+"/";
+        }
+
+        resultado = resultado.substring(0, resultado.length()-1); //elimina el ultimo caracter
+
+        System.out.println(resultado);
+
+        return resultado;
+    }
+
     private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
         System.out.println("Alta");
-        String myDriver = "com.mysql.cj.jdbc.Driver";
-        String myUrl = "jdbc:mysql://192.168.209.128:3306/ELCAMINO?zeroDateTimeBehavior=convertToNull";
         String id, nombre, nacion, fecha;
         String dateClean;
 
@@ -201,17 +248,7 @@ public class VentanaPeregrino extends javax.swing.JFrame {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         
         
-        
-        try {            
-            Date date = formatter.parse(fecha);            
-            dateClean = formatter.format(date);
-        } catch (ParseException ex) {
-            JFrame jf7 = new JFrame();
-            JOptionPane.showMessageDialog(jf7, "Fecha no válida");
-            return;
-            //Logger.getLogger(VentanaPeregrino.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println(dateClean);
+
 
         if (id.equals("") || nombre.equals("") || fecha.equals("")) {
             JFrame jf5 = new JFrame();
@@ -226,8 +263,6 @@ public class VentanaPeregrino extends javax.swing.JFrame {
         }
 
         try {
-            Class.forName(myDriver);
-            Connection conn = DriverManager.getConnection(myUrl, "usuario", "curso2122");
             Statement st = conn.createStatement();
 
             Statement st2 = conn.createStatement();
@@ -235,7 +270,8 @@ public class VentanaPeregrino extends javax.swing.JFrame {
             ResultSet rs = st2.executeQuery("SELECT * FROM PEREGRINO WHERE dni='" + id + "'");
 
             if (!rs.next()) {
-                st.executeUpdate("INSERT INTO PEREGRINO(dni, nombre, nacion, fechafinal) VALUES('" + id + "','" + nombre + "','" + nacion + "','" + dateClean + "')");
+                fecha = fixFecha(fecha);
+                st.executeUpdate("INSERT INTO PEREGRINO(dni, nombre, nacion, fechafinal) VALUES('" + id + "','" + nombre + "','" + nacion + "','" + /*dateClean*/ fecha + "')");
                 System.out.println("Registro introducido con exito.");
             } else {
                 JFrame jf3 = new JFrame();
@@ -245,10 +281,7 @@ public class VentanaPeregrino extends javax.swing.JFrame {
             rs.close();
             st.close();
             st2.close();
-            conn.close();
         } catch (SQLException ex) {
-            Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
             Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton3MouseClicked
@@ -261,17 +294,12 @@ public class VentanaPeregrino extends javax.swing.JFrame {
         if (result == 1) {
             return;
         } else if (result == 0) {
-            String myDriver = "com.mysql.cj.jdbc.Driver";
-            String myUrl = "jdbc:mysql://192.168.209.128:3306/ELCAMINO?zeroDateTimeBehavior=convertToNull";
             String id;
 
             id = txtIdPeregrino.getText();
 
             try {
-                Class.forName(myDriver);
-                Connection conn = DriverManager.getConnection(myUrl, "usuario", "curso2122");
                 Statement st = conn.createStatement();
-
                 Statement st2 = conn.createStatement();
 
                 ResultSet rs = st2.executeQuery("SELECT * FROM PEREGRINO WHERE dni='" + id + "'");
@@ -289,10 +317,7 @@ public class VentanaPeregrino extends javax.swing.JFrame {
                 rs.close();
                 st.close();
                 st2.close();
-                conn.close();
             } catch (SQLException ex) {
-                Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
                 Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else{
@@ -302,8 +327,6 @@ public class VentanaPeregrino extends javax.swing.JFrame {
 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
         System.out.println("UPDATE");
-        String myDriver = "com.mysql.cj.jdbc.Driver";
-        String myUrl = "jdbc:mysql://192.168.209.128:3306/ELCAMINO?zeroDateTimeBehavior=convertToNull";
         String id, nombre, nacion, fecha;
         String dateClean;
 
@@ -313,17 +336,6 @@ public class VentanaPeregrino extends javax.swing.JFrame {
         fecha = txtFechaFinal.getText().trim();
         
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                        
-        try {            
-            Date date = formatter.parse(fecha);            
-            dateClean = formatter.format(date);
-        } catch (ParseException ex) {
-            JFrame jf7 = new JFrame();
-            JOptionPane.showMessageDialog(jf7, "Fecha no válida");
-            return;
-            //Logger.getLogger(VentanaPeregrino.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println(dateClean);
 
         if (id.equals("") || nombre.equals("") || fecha.equals("")) {
             JFrame jf5 = new JFrame();
@@ -338,8 +350,6 @@ public class VentanaPeregrino extends javax.swing.JFrame {
         }
 
         try {
-            Class.forName(myDriver);
-            Connection conn = DriverManager.getConnection(myUrl, "usuario", "curso2122");
             Statement st = conn.createStatement();
 
             Statement st2 = conn.createStatement();
@@ -350,7 +360,7 @@ public class VentanaPeregrino extends javax.swing.JFrame {
                 JFrame jf3 = new JFrame();
                 JOptionPane.showMessageDialog(jf3, "El Peregrino con dni: " + id + " no esta introducido en la base de datos");                                
             } else {
-                st.executeUpdate("UPDATE PEREGRINO set nombre='"+nombre+"', nacion='"+nacion+"', fechafinal='"+fecha+"' where dni= '"+id+"'");
+                st.executeUpdate("UPDATE PEREGRINO set nombre='"+nombre+"', nacion='"+nacion+"', fechafinal='"+fixFecha(fecha)+"' where dni= '"+id+"'");
                // st.executeUpdate("UPDATE PEREGRINO set nacion='"+nacion+"' where id= '"+id+"'");
                // st.executeUpdate("UPDATE PEREGRINO set fechafinal='"+fecha+"' where id= '"+id+"'");
                 System.out.println("Registro introducido con exito.");
@@ -359,17 +369,11 @@ public class VentanaPeregrino extends javax.swing.JFrame {
             rs.close();
             st.close();
             st2.close();
-            conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }
     }//GEN-LAST:event_jButton4MouseClicked
 
-    /**
-     * @param args the command line arguments
-     */
     public static void abrir() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
