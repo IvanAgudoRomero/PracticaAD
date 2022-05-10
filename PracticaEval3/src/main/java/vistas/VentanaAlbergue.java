@@ -5,6 +5,8 @@
  */
 package vistas;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,13 +19,39 @@ import javax.swing.JOptionPane;
  */
 public class VentanaAlbergue extends javax.swing.JFrame {
 
+    private String myDriver;
+    private String myUrl;
+    private Connection conn;
     /**
      * Creates new form VentanaAlbergue
      */
     public VentanaAlbergue() {
         initComponents();
         setTitle("Albergues");
+        myDriver = "com.mysql.cj.jdbc.Driver";
+        //myUrl = "jdbc:mysql://192.168.209.128:3306/ELCAMINO?zeroDateTimeBehavior=convertToNull";
+        myUrl = "jdbc:mysql://192.168.25.128:3306/ELCAMINO";
+
+        try {
+            Class.forName(myDriver);
+            conn = DriverManager.getConnection(myUrl, "usuario", "curso2122");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    conn.close(); //se cierra la conexión al cerrar la ventana.
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
@@ -168,14 +196,12 @@ public class VentanaAlbergue extends javax.swing.JFrame {
 
     private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
         System.out.println("ALTA");
-        String myDriver = "com.mysql.cj.jdbc.Driver";
-        String myUrl = "jdbc:mysql://192.168.209.128:3306/ELCAMINO?zeroDateTimeBehavior=convertToNull";
         String id, nombre, capacidad, idCiudad;
 
         id = txtIdAlbergue.getText().trim();
         nombre = txtNombreAlbergue.getText().trim();
         capacidad = txtCapacidad.getText().trim();
-        idCiudad = txtCapacidad.getText().trim();
+        idCiudad = txtIdCiudad.getText().trim();
 
         if (id.equals("") || nombre.equals("")) {
             JFrame jf = new JFrame();
@@ -190,17 +216,16 @@ public class VentanaAlbergue extends javax.swing.JFrame {
         }        
 
         try {
-            Class.forName(myDriver);
-            Connection conn = DriverManager.getConnection(myUrl, "usuario", "curso2122");
             Statement st = conn.createStatement();
-
             Statement st2 = conn.createStatement();
+            Statement st3 = conn.createStatement();
+
+            st3.execute("SET FOREIGN_KEY_CHECKS=0;");
 
             ResultSet rs = st2.executeQuery("SELECT * FROM ALBERGUE WHERE idalbergue='" + id + "'");
 
             if (!rs.next()) {
-                //st.execute("INSERT INTO ALBERGUE VALUES('"+id+"','"+nombre+"','"+capacidad+"','"+idCiudad+"')");
-                st.executeUpdate("INSERT INTO ALBERGUE(idalbergue, nomalbergue, capacidad, idciudad) VALUES('" + id + "','" + nombre + "','" + capacidad + "','" + idCiudad + "')");
+                st.execute("INSERT INTO ALBERGUE(idalbergue, nomalbergue, capacidad, idciudad) VALUES('" + id + "','" + nombre + "','" + capacidad + "','" + idCiudad + "')");
                 System.out.println("Registro introducido con exito.");
             } else {
                 JFrame jf3 = new JFrame();
@@ -212,8 +237,6 @@ public class VentanaAlbergue extends javax.swing.JFrame {
             st2.close();
             conn.close();
         } catch (SQLException ex) {
-            Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
             Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -227,9 +250,6 @@ public class VentanaAlbergue extends javax.swing.JFrame {
         if (result == 1) {
             return;
         } else if (result == 0) {
-
-            String myDriver = "com.mysql.cj.jdbc.Driver";
-            String myUrl = "jdbc:mysql://192.168.209.128:3306/ELCAMINO?zeroDateTimeBehavior=convertToNull";
             String id;
 
             id = txtIdAlbergue.getText();
@@ -238,12 +258,13 @@ public class VentanaAlbergue extends javax.swing.JFrame {
                 Class.forName(myDriver);
                 Connection conn = DriverManager.getConnection(myUrl, "usuario", "curso2122");
                 Statement st = conn.createStatement();
-
                 Statement st2 = conn.createStatement();
+                Statement st3 = conn.createStatement();
 
                 ResultSet rs = st2.executeQuery("SELECT * FROM ALBERGUE WHERE idalbergue='" + id + "'");
 
                 if (rs.next()) {
+                    st3.executeUpdate("DELETE FROM RESERVA WHERE idalbergue='" + id + "'");  //para borrar en cascada
                     st.executeUpdate("DELETE FROM ALBERGUE WHERE idalbergue='" + id + "'");
                     JFrame jf5 = new JFrame();
                     JOptionPane.showMessageDialog(jf5, "Registro borrado con éxito.");
