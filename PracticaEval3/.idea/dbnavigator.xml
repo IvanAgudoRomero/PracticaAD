@@ -29,7 +29,7 @@
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="af679bd8-acc8-4a29-ba27-a06f4c3879f5">
       <console name="Connection" type="STANDARD" schema="ELCAMINO" session="Main"><![CDATA[--INSERT INTO ALBERGUE(idalbergue, nomalbergue, capacidad, idciudad) VALUES('wtf','tres marqueses','77','AR1');
-select * from ALBERGUE;]]></console>
+select * from PEREGRINO;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
