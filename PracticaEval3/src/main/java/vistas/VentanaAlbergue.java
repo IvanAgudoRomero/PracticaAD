@@ -235,7 +235,6 @@ public class VentanaAlbergue extends javax.swing.JFrame {
             rs.close();
             st.close();
             st2.close();
-            conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -277,7 +276,6 @@ public class VentanaAlbergue extends javax.swing.JFrame {
                 rs.close();
                 st.close();
                 st2.close();
-                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(VentanaAlbergue.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
