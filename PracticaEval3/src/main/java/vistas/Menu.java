@@ -5,6 +5,8 @@
  */
 package vistas;
 
+import server.ServidorInforme;
+
 import java.awt.Component;
 import javax.swing.JFrame;
 
@@ -21,6 +23,7 @@ public class Menu extends javax.swing.JFrame {
  
     public Menu() {
         initComponents();
+        //ServidorInforme si = new ServidorInforme();
     }
 
     /**
@@ -184,8 +187,8 @@ public class Menu extends javax.swing.JFrame {
             vi = new VentanaInforme();
         }
 
-        va.setLocationRelativeTo(null);
-        va.setVisible(true);        
+        vi.setLocationRelativeTo(null);
+        vi.setVisible(true);
     }//GEN-LAST:event_jButton4MouseClicked
 
     private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
