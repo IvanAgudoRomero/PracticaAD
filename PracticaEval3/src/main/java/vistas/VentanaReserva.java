@@ -6,6 +6,7 @@
 package vistas;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class VentanaReserva extends javax.swing.JFrame {
 
         initComponents();
         jComboBox2.setEditable(false);
+
         
         setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 
@@ -188,8 +190,9 @@ public class VentanaReserva extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(0, 204, 204));
 
-        jLabel1.setBackground(new java.awt.Color(255, 255, 102));
         jLabel1.setText("CAMINO DE SANTIAGO");
+        jLabel1.setBackground(Color.yellow);
+        jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
 
         jLabel2.setText("Camino:");
 
