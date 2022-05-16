@@ -220,12 +220,12 @@ public class VentanaAlbergue extends javax.swing.JFrame {
             Statement st2 = conn.createStatement();
             Statement st3 = conn.createStatement();
 
-            st3.execute("SET FOREIGN_KEY_CHECKS=0;");
+            st3.execute("SET FOREIGN_KEY_CHECKS=0;");   // es necesario para que no se queje para la clave foranea
 
             ResultSet rs = st2.executeQuery("SELECT * FROM ALBERGUE WHERE idalbergue='" + id + "'");
 
             if (!rs.next()) {
-                st.execute("INSERT INTO ALBERGUE(idalbergue, nomalbergue, capacidad, idciudad) VALUES('" + id + "','" + nombre + "','" + capacidad + "','" + idCiudad + "')");
+                st.execute("INSERT INTO ALBERGUE(idalbergue, nomalbergue, capacidad, plazaslibres, idciudad) VALUES('" + id + "','" + nombre + "','" + capacidad + "','"+capacidad+"','" + idCiudad + "')");
                 System.out.println("Registro introducido con exito.");
             } else {
                 JFrame jf3 = new JFrame();
@@ -251,7 +251,7 @@ public class VentanaAlbergue extends javax.swing.JFrame {
         } else if (result == 0) {
             String id;
 
-            id = txtIdAlbergue.getText();
+            id = txtIdAlbergue.getText().trim();
 
             try {
                 Class.forName(myDriver);

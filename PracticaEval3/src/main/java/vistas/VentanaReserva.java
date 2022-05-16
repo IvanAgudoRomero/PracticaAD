@@ -491,14 +491,23 @@ public class VentanaReserva extends javax.swing.JFrame {
         try {
             Statement st = conn.createStatement();
             Statement st2 = conn.createStatement();
+            Statement st3 = conn.createStatement();
+            Statement st4 = conn.createStatement();
 
             ResultSet rs = st2.executeQuery("select * from RESERVA where dni='"+dni+"' and fecha='"+fecha+"'");
-
+            ResultSet rs2;
+            int plazas = 0;
             if(!rs.next()){
                 //no hay ninguna
                 st.executeUpdate("INSERT INTO RESERVA(dni, fecha, idalbergue) VALUES('"+dni+"','"+fecha+"','"+idAlbergue+"')");
                 JFrame jf2 = new JFrame();
                 JOptionPane.showMessageDialog(jf2, "Reserva introducida con éxito.");
+
+                rs2 = st3.executeQuery("SELECT plazaslibres FROM ALBERGUE WHERE idalbergue='"+idAlbergue+"'");
+                while(rs2.next()){
+                    plazas = rs2.getInt(1);
+                }
+                st4.executeUpdate("UPDATE ALBERGUE SET plazaslibres = '"+(plazas-1)+"' WHERE idalbergue ='"+idAlbergue+"'");
             }else{
                 //ya hay una
                 JFrame jf = new JFrame();
